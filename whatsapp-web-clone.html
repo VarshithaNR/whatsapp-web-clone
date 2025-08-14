@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Web Clone</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #111b21;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background-color: #111b21;
+        }
+        /* Sidebar */
+        
+        .sidebar {
+            width: 30%;
+            min-width: 300px;
+            background-color: #111b21;
+            border-right: 1px solid #313d45;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-header {
+            background-color: #202c33;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 59px;
+        }
+        
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 20px;
+            color: #aebac1;
+        }
+        
+        .search-container {
+            padding: 7px 12px;
+            background-color: #111b21;
+        }
+        
+        .search-box {
+            background-color: #202c33;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 12px;
+            width: 100%;
+            color: #e9edef;
+            font-size: 14px;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            background-color: #2a3942;
+        }
+        
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .chat-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #313d45;
+            transition: background-color 0.2s;
+        }
+        
+        .chat-item:hover {
+            background-color: #202c33;
+        }
+        
+        .chat-item.active {
+            background-color: #2a3942;
+        }
+        
+        .chat-avatar {
+            width: 49px;
+            height: 49px;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+            font-size: 18px;
+        }
+        
+        .chat-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .chat-name {
+            color: #e9edef;
+            font-size: 16px;
+            font-weight: 400;
+            margin-bottom: 2px;
+        }
+        
+        .chat-preview {
+            color: #8696a0;
+            font-size: 14px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .chat-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        
+        .chat-time {
+            color: #8696a0;
+            font-size: 12px;
+        }
+        
+        .unread-badge {
+            background-color: #00a884;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        /* Main Chat Area */
+        
+        .chat-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #0b141a;
+        }
+        
+        .chat-header {
+            background-color: #202c33;
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            height: 59px;
+            border-bottom: 1px solid #313d45;
+        }
+        
+        .chat-header-info {
+            flex: 1;
+            margin-left: 15px;
+        }
+        
+        .chat-header-name {
+            color: #e9edef;
+            font-size: 16px;
+            font-weight: 400;
+        }
+        
+        .chat-header-status {
+            color: #8696a0;
+            font-size: 13px;
+        }
+        
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="chat-bg" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="50" cy="50" r="1" fill="%23ffffff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23chat-bg)"/></svg>');
+        }
+        
+        .message-group {
+            margin-bottom: 12px;
+        }
+        
+        .message {
+            max-width: 65%;
+            margin-bottom: 2px;
+            padding: 6px 7px 8px 9px;
+            border-radius: 7.5px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .message.sent {
+            background-color: #005c4b;
+            color: #e9edef;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        
+        .message.received {
+            background-color: #202c33;
+            color: #e9edef;
+            margin-left: 0;
+            margin-right: auto;
+        }
+        
+        .message-text {
+            font-size: 14px;
+            line-height: 19px;
+            margin-bottom: 4px;
+        }
+        
+        .message-footer {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 4px;
+            font-size: 11px;
+            color: #8696a0;
+            margin-top: 4px;
+        }
+        
+        .message-time {
+            color: #8696a0;
+        }
+        
+        .message-status {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-icon {
+            width: 16px;
+            height: 16px;
+        }
+        /* Message Input */
+        
+        .message-input-container {
+            background-color: #202c33;
+            padding: 5px 16px 5px 10px;
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+        }
+        
+        .input-actions-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #8696a0;
+            padding-bottom: 8px;
+        }
+        
+        .message-input-wrapper {
+            flex: 1;
+            position: relative;
+        }
+        
+        .message-input {
+            width: 100%;
+            background-color: #2a3942;
+            border: none;
+            border-radius: 21px;
+            padding: 9px 52px 11px 12px;
+            color: #e9edef;
+            font-size: 15px;
+            line-height: 20px;
+            max-height: 100px;
+            resize: none;
+            outline: none;
+        }
+        
+        .input-emoji {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #8696a0;
+            cursor: pointer;
+        }
+        
+        .send-button {
+            background-color: #00a884;
+            border: none;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            margin-bottom: 3px;
+        }
+        
+        .send-button:hover {
+            background-color: #06c755;
+        }
+        /* Welcome Screen */
+        
+        .welcome-screen {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #0b141a;
+            color: #8696a0;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .welcome-logo {
+            width: 320px;
+            height: 200px;
+            background: linear-gradient(135deg, #00a884 0%, #06c755 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            color: white;
+            margin-bottom: 28px;
+        }
+        
+        .welcome-title {
+            font-size: 32px;
+            color: #e9edef;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+        
+        .welcome-text {
+            font-size: 14px;
+            line-height: 20px;
+            max-width: 470px;
+        }
+        /* Responsive Design */
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                min-width: auto;
+            }
+            .chat-main {
+                display: none;
+            }
+            .chat-main.mobile-active {
+                display: flex;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 1000;
+            }
+            .sidebar.mobile-hidden {
+                display: none;
+            }
+            .back-button {
+                color: #8696a0;
+                margin-right: 15px;
+                cursor: pointer;
+                font-size: 18px;
+            }
+        }
+        /* Scrollbar Styling */
+        
+         ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+         ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+         ::-webkit-scrollbar-thumb {
+            background: #374045;
+            border-radius: 3px;
+        }
+        
+         ::-webkit-scrollbar-thumb:hover {
+            background: #4a5257;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <!-- Header -->
+            <div class="sidebar-header">
+                <div class="profile-pic">ME</div>
+                <div class="header-actions">
+                    <span>💬</span>
+                    <span>⋯</span>
+                </div>
+            </div>
+
+            <!-- Search -->
+            <div class="search-container">
+                <input type="text" class="search-box" placeholder="Search or start new chat" id="searchBox">
+            </div>
+
+            <!-- Chat List -->
+            <div class="chat-list" id="chatList">
+                <!-- Chat items will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-main" id="chatMain">
+            <!-- Welcome Screen (default) -->
+            <div class="welcome-screen" id="welcomeScreen">
+                <div class="welcome-logo">💬</div>
+                <h1 class="welcome-title">WhatsApp Web</h1>
+                <p class="welcome-text">
+                    Send and receive messages without keeping your phone online.<br> Use WhatsApp on up to 4 linked devices and 1 phone at the same time.
+                </p>
+            </div>
+
+            <!-- Chat Header (hidden by default) -->
+            <div class="chat-header" id="chatHeader" style="display: none;">
+                <span class="back-button" id="backButton" style="display: none;">←</span>
+                <div class="chat-avatar" id="headerAvatar"></div>
+                <div class="chat-header-info">
+                    <div class="chat-header-name" id="headerName"></div>
+                    <div class="chat-header-status" id="headerStatus">online</div>
+                </div>
+                <div class="header-actions">
+                    <span>🔍</span>
+                    <span>⋯</span>
+                </div>
+            </div>
+
+            <!-- Messages Container (hidden by default) -->
+            <div class="messages-container" id="messagesContainer" style="display: none;">
+                <!-- Messages will be populated here -->
+            </div>
+
+            <!-- Message Input (hidden by default) -->
+            <div class="message-input-container" id="messageInputContainer" style="display: none;">
+                <div class="input-actions-left">
+                    <span>😊</span>
+                    <span>📎</span>
+                </div>
+                <div class="message-input-wrapper">
+                    <textarea class="message-input" id="messageInput" placeholder="Type a message" rows="1"></textarea>
+                    <span class="input-emoji">😊</span>
+                </div>
+                <button class="send-button" id="sendButton">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M1.101 21.757L23.8 12.028 1.101 2.3l.011 7.912 13.623 1.816-13.623 1.817-.011 7.912z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data to simulate WhatsApp conversations
+        const sampleData = {
+            chats: [{
+                wa_id: "919876543210",
+                name: "Alice Johnson",
+                lastMessage: "Hey! How are you doing?",
+                timestamp: "2024-01-15T10:30:00Z",
+                unread: 2,
+                avatar: "AJ"
+            }, {
+                wa_id: "919876543211",
+                name: "Bob Smith",
+                lastMessage: "Meeting at 3 PM today",
+                timestamp: "2024-01-15T09:45:00Z",
+                unread: 0,
+                avatar: "BS"
+            }, {
+                wa_id: "919876543212",
+                name: "Carol Williams",
+                lastMessage: "Thanks for the help!",
+                timestamp: "2024-01-15T08:20:00Z",
+                unread: 1,
+                avatar: "CW"
+            }, {
+                wa_id: "919876543213",
+                name: "David Brown",
+                lastMessage: "See you tomorrow",
+                timestamp: "2024-01-14T18:15:00Z",
+                unread: 0,
+                avatar: "DB"
+            }, {
+                wa_id: "919876543214",
+                name: "Emma Davis",
+                lastMessage: "Great job on the project! 👏",
+                timestamp: "2024-01-14T16:30:00Z",
+                unread: 3,
+                avatar: "ED"
+            }],
+            messages: {
+                "919876543210": [{
+                    id: "msg1",
+                    from: "919876543210",
+                    text: "Hey! How are you doing?",
+                    timestamp: "2024-01-15T10:30:00Z",
+                    type: "received",
+                    status: "read"
+                }, {
+                    id: "msg2",
+                    from: "me",
+                    text: "Hi Alice! I'm doing well, thanks for asking. How about you?",
+                    timestamp: "2024-01-15T10:32:00Z",
+                    type: "sent",
+                    status: "read"
+                }, {
+                    id: "msg3",
+                    from: "919876543210",
+                    text: "I'm great! Just finished a big project at work. Feeling relieved! 😊",
+                    timestamp: "2024-01-15T10:35:00Z",
+                    type: "received",
+                    status: "delivered"
+                }],
+                "919876543211": [{
+                    id: "msg4",
+                    from: "919876543211",
+                    text: "Hey, don't forget about our meeting today",
+                    timestamp: "2024-01-15T09:45:00Z",
+                    type: "received",
+                    status: "read"
+                }, {
+                    id: "msg5",
+                    from: "919876543211",
+                    text: "Meeting at 3 PM today",
+                    timestamp: "2024-01-15T09:46:00Z",
+                    type: "received",
+                    status: "delivered"
+                }, {
+                    id: "msg6",
+                    from: "me",
+                    text: "Absolutely! I'll be there. Conference room B, right?",
+                    timestamp: "2024-01-15T09:48:00Z",
+                    type: "sent",
+                    status: "read"
+                }],
+                "919876543212": [{
+                    id: "msg7",
+                    from: "me",
+                    text: "No problem! Happy to help anytime",
+                    timestamp: "2024-01-15T08:18:00Z",
+                    type: "sent",
+                    status: "read"
+                }, {
+                    id: "msg8",
+                    from: "919876543212",
+                    text: "Thanks for the help!",
+                    timestamp: "2024-01-15T08:20:00Z",
+                    type: "received",
+                    status: "delivered"
+                }],
+                "919876543213": [{
+                    id: "msg9",
+                    from: "919876543213",
+                    text: "See you tomorrow",
+                    timestamp: "2024-01-14T18:15:00Z",
+                    type: "received",
+                    status: "read"
+                }, {
+                    id: "msg10",
+                    from: "me",
+                    text: "Looking forward to it!",
+                    timestamp: "2024-01-14T18:16:00Z",
+                    type: "sent",
+                    status: "read"
+                }],
+                "919876543214": [{
+                    id: "msg11",
+                    from: "919876543214",
+                    text: "I saw your presentation today",
+                    timestamp: "2024-01-14T16:28:00Z",
+                    type: "received",
+                    status: "read"
+                }, {
+                    id: "msg12",
+                    from: "919876543214",
+                    text: "Great job on the project! 👏",
+                    timestamp: "2024-01-14T16:30:00Z",
+                    type: "received",
+                    status: "delivered"
+                }, {
+                    id: "msg13",
+                    from: "919876543214",
+                    text: "The client was really impressed!",
+                    timestamp: "2024-01-14T16:31:00Z",
+                    type: "received",
+                    status: "sent"
+                }, {
+                    id: "msg14",
+                    from: "me",
+                    text: "Thank you so much Emma! That means a lot coming from you 🙏",
+                    timestamp: "2024-01-14T16:35:00Z",
+                    type: "sent",
+                    status: "delivered"
+                }]
+            }
+        };
+
+        // Avatar colors for different users
+        const avatarColors = [
+            '#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe',
+            '#43e97b', '#fa709a', '#fee140', '#a8edea', '#d299c2'
+        ];
+
+        // Current active chat
+        let activeChat = null;
+        let messageIdCounter = 1000;
+
+        // Initialize the app
+        function initApp() {
+            populateChatList();
+            setupEventListeners();
+        }
+
+        // Populate chat list from sample data
+        function populateChatList() {
+            const chatList = document.getElementById('chatList');
+            chatList.innerHTML = '';
+
+            sampleData.chats.forEach((chat, index) => {
+                const chatItem = createChatItem(chat, index);
+                chatList.appendChild(chatItem);
+            });
+        }
+
+        // Create a chat item element
+        function createChatItem(chat, index) {
+            const div = document.createElement('div');
+            div.className = 'chat-item';
+            div.dataset.waId = chat.wa_id;
+
+            const avatarColor = avatarColors[index % avatarColors.length];
+            const formattedTime = formatTime(chat.timestamp);
+
+            div.innerHTML = `
+                <div class="chat-avatar" style="background: ${avatarColor}">${chat.avatar}</div>
+                <div class="chat-info">
+                    <div class="chat-name">${chat.name}</div>
+                    <div class="chat-preview">${chat.lastMessage}</div>
+                </div>
+                <div class="chat-meta">
+                    <div class="chat-time">${formattedTime}</div>
+                    ${chat.unread > 0 ? `<div class="unread-badge">${chat.unread}</div>` : ''}
+                </div>
+            `;
+
+            div.addEventListener('click', () => openChat(chat));
+            return div;
+        }
+
+        // Open a specific chat
+        function openChat(chat) {
+            activeChat = chat;
+
+            // Update active state in sidebar
+            document.querySelectorAll('.chat-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            document.querySelector(`[data-wa-id="${chat.wa_id}"]`).classList.add('active');
+
+            // Show chat interface
+            showChatInterface(chat);
+
+            // Load messages
+            loadMessages(chat.wa_id);
+
+            // Mobile responsive
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.add('mobile-hidden');
+                document.getElementById('chatMain').classList.add('mobile-active');
+                document.getElementById('backButton').style.display = 'inline';
+            }
+        }
+
+        // Show chat interface
+        function showChatInterface(chat) {
+            // Hide welcome screen
+            document.getElementById('welcomeScreen').style.display = 'none';
+
+            // Show chat elements
+            document.getElementById('chatHeader').style.display = 'flex';
+            document.getElementById('messagesContainer').style.display = 'block';
+            document.getElementById('messageInputContainer').style.display = 'flex';
+
+            // Update header info
+            const avatarIndex = sampleData.chats.findIndex(c => c.wa_id === chat.wa_id);
+            const avatarColor = avatarColors[avatarIndex % avatarColors.length];
+            
+            document.getElementById('headerAvatar').style.background = avatarColor;
+            document.getElementById('headerAvatar').textContent = chat.avatar;
+            document.getElementById('headerName').textContent = chat.name;
+        }
+
+        // Load messages for a specific chat
+        function loadMessages(waId) {
+            const messagesContainer = document.getElementById('messagesContainer');
+            messagesContainer.innerHTML = '';
+
+            const messages = sampleData.messages[waId] || [];
+            
+            messages.forEach(message => {
+                const messageElement = createMessageElement(message);
+                messagesContainer.appendChild(messageElement);
+            });
+
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Create a message element
+        function createMessageElement(message) {
+            const div = document.createElement('div');
+            div.className = `message ${message.type}`;
+            
+            const formattedTime = formatTime(message.timestamp);
+            const statusIcon = getStatusIcon(message.status);
+            
+            div.innerHTML = `
+                <div class="message-text">${message.text}</div>
+                <div class="message-footer">
+                    <span class="message-time">${formattedTime}</span>
+                    ${message.type === 'sent' ? `<span class="message-status">${statusIcon}</span>` : ''}
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Get status icon based on message status
+        function getStatusIcon(status) {
+            switch(status) {
+                case 'sent':
+                    return '✓';
+                case 'delivered':
+                    return '✓✓';
+                case 'read':
+                    return '<span style="color: #53bdeb;">✓✓</span>';
+                default:
+                    return '⏰';
+            }
+        }
+
+        // Format timestamp
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+            
+            if (diffDays === 0) {
+                return date.toLocaleTimeString('en-US', { 
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    hour12: false 
+                });
+            } else if (diffDays === 1) {
+                return 'Yesterday';
+            } else if (diffDays < 7) {
+                return date.toLocaleDateString('en-US', { weekday: 'short' });
+            } else {
+                return date.toLocaleDateString('en-US', { 
+                    month: 'short', 
+                    day: 'numeric' 
+                });
+            }
+        }
+
+        // Send a new message
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const messageText = messageInput.value.trim();
+            
+            if (!messageText || !activeChat) return;
+
+            // Create new message
+            const newMessage = {
+                id: `msg${messageIdCounter++}`,
+                from: "me",
+                text: messageText,
+                timestamp: new Date().toISOString(),
+                type: "sent",
+                status: "sent"
+            };
+
+            // Add to messages data
+            if (!sampleData.messages[activeChat.wa_id]) {
+                sampleData.messages[activeChat.wa_id] = [];
+            }
+            sampleData.messages[activeChat.wa_id].push(newMessage);
+
+            // Update UI
+            const messageElement = createMessageElement(newMessage);
+            document.getElementById('messagesContainer').appendChild(messageElement);
+
+            // Update chat preview in sidebar
+            const chatItem = document.querySelector(`[data-wa-id="${activeChat.wa_id}"]`);
+            const preview = chatItem.querySelector('.chat-preview');
+            preview.textContent = messageText;
+
+            // Update timestamp
+            const timeElement = chatItem.querySelector('.chat-time');
+            timeElement.textContent = formatTime(newMessage.timestamp);
+
+            // Clear input and scroll to bottom
+            messageInput.value = '';
+            const messagesContainer = document.getElementById('messagesContainer');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            // Simulate message status updates
+            setTimeout(() => {
+                newMessage.status = 'delivered';
+                updateMessageStatus(newMessage.id, 'delivered');
+            }, 1000);
+
+            setTimeout(() => {
+                newMessage.status = 'read';
+                updateMessageStatus(newMessage.id, 'read');
+            }, 3000);
+
+            // Auto-resize textarea
+            messageInput.style.height = 'auto';
+        }
+
+        // Update message status
+        function updateMessageStatus(messageId, status) {
+            const messageElements = document.querySelectorAll('.message.sent');
+            messageElements.forEach(element => {
+                const messageData = sampleData.messages[activeChat.wa_id].find(msg => 
+                    msg.id === messageId && msg.type === 'sent'
+                );
+                
+                if (messageData && messageData.id === messageId) {
+                    const statusElement = element.querySelector('.message-status');
+                    if (statusElement) {
+                        statusElement.innerHTML = getStatusIcon(status);
+                    }
+                }
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Send message button
+            document.getElementById('sendButton').addEventListener('click', sendMessage);
+
+            // Message input enter key
+            document.getElementById('messageInput').addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendMessage();
+                }
+            });
+
+            // Auto-resize textarea
+            document.getElementById('messageInput').addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+
+            // Back button for mobile
+            document.getElementById('backButton').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('mobile-hidden');
+                document.getElementById('chatMain').classList.remove('mobile-active');
+                document.getElementById('backButton').style.display = 'none';
+            });
+
+            // Search functionality
+            document.getElementById('searchBox').addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const chatItems = document.querySelectorAll('.chat-item');
+                
+                chatItems.forEach(item => {
+                    const name = item.querySelector('.chat-name').textContent.toLowerCase();
+                    if (name.includes(searchTerm)) {
+                        item.style.display = 'flex';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+
+            // Handle window resize
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    document.getElementById('sidebar').classList.remove('mobile-hidden');
+                    document.getElementById('chatMain').classList.remove('mobile-active');
+                    document.getElementById('backButton').style.display = 'none';
+                }
+            });
+        }
+
+        // Simulate real-time message updates (WebSocket simulation)
+        function simulateRealTimeMessages() {
+            const sampleMessages = [
+                { from: "919876543210", text: "Just checking in! How's your day going? 😊" },
+                { from: "919876543211", text: "Meeting rescheduled to 4 PM" },
+                { from: "919876543212", text: "Can you send me the document when you have a chance?" },
+                { from: "919876543214", text: "Loved your idea in today's meeting! 💡" },
+                { from: "919876543213", text: "Coffee tomorrow at 10?" }
+            ];
+
+            setInterval(() => {
+                if (Math.random() < 0.3) { // 30% chance every 10 seconds
+                    const randomMessage = sampleMessages[Math.floor(Math.random() * sampleMessages.length)];
+                    const waId = randomMessage.from;
+                    
+                    const newMessage = {
+                        id: `msg${messageIdCounter++}`,
+                        from: waId,
+                        text: randomMessage.text,
+                        timestamp: new Date().toISOString(),
+                        type: "received",
+                        status: "delivered"
+                    };
+
+                    // Add to messages data
+                    if (!sampleData.messages[waId]) {
+                        sampleData.messages[waId] = [];
+                    }
+                    sampleData.messages[waId].push(newMessage);
+
+                    // Update chat preview in sidebar
+                    const chat = sampleData.chats.find(c => c.wa_id === waId);
+                    if (chat) {
+                        chat.lastMessage = newMessage.text;
+                        chat.timestamp = newMessage.timestamp;
+                        chat.unread = (chat.unread || 0) + 1;
+                    }
+
+                    // Refresh chat list to show new message
+                    populateChatList();
+
+                    // If this is the active chat, add message to view
+                    if (activeChat && activeChat.wa_id === waId) {
+                        const messageElement = createMessageElement(newMessage);
+                        document.getElementById('messagesContainer').appendChild(messageElement);
+                        
+                        // Scroll to bottom
+                        const messagesContainer = document.getElementById('messagesContainer');
+                        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                        // Reset unread count for active chat
+                        chat.unread = 0;
+                        populateChatList();
+                    }
+
+                    // Show notification sound simulation
+                    console.log('New message received from:', chat?.name || waId);
+                }
+            }, 10000); // Check every 10 seconds
+        }
+
+        // Simulate typing indicator
+        function showTypingIndicator(waId) {
+            if (activeChat && activeChat.wa_id === waId) {
+                const statusElement = document.getElementById('headerStatus');
+                statusElement.textContent = 'typing...';
+                statusElement.style.color = '#00a884';
+
+                setTimeout(() => {
+                    statusElement.textContent = 'online';
+                    statusElement.style.color = '#8696a0';
+                }, 2000);
+            }
+        }
+
+        // Enhanced message status simulation
+        function simulateMessageStatusUpdates() {
+            setInterval(() => {
+                // Find sent messages that need status updates
+                Object.keys(sampleData.messages).forEach(waId => {
+                    sampleData.messages[waId].forEach(message => {
+                        if (message.type === 'sent' && message.status === 'sent') {
+                            message.status = 'delivered';
+                            if (activeChat && activeChat.wa_id === waId) {
+                                updateMessageStatus(message.id, 'delivered');
+                            }
+                        } else if (message.type === 'sent' && message.status === 'delivered' && Math.random() < 0.1) {
+                            message.status = 'read';
+                            if (activeChat && activeChat.wa_id === waId) {
+                                updateMessageStatus(message.id, 'read');
+                            }
+                        }
+                    });
+                });
+            }, 5000);
+        }
+
+        // Load additional sample conversations
+        function loadMoreSampleData() {
+            // Add more sample chats
+            const additionalChats = [
+                {
+                    wa_id: "919876543215",
+                    name: "Frank Miller",
+                    lastMessage: "Happy birthday! 🎉",
+                    timestamp: "2024-01-13T14:20:00Z",
+                    unread: 0,
+                    avatar: "FM"
+                },
+                {
+                    wa_id: "919876543216",
+                    name: "Grace Wilson",
+                    lastMessage: "The report looks good!",
+                    timestamp: "2024-01-13T11:45:00Z",
+                    unread: 1,
+                    avatar: "GW"
+                },
+                {
+                    wa_id: "919876543217",
+                    name: "Henry Taylor",
+                    lastMessage: "Let's catch up soon",
+                    timestamp: "2024-01-12T16:30:00Z",
+                    unread: 0,
+                    avatar: "HT"
+                }
+            ];
+
+            // Add additional messages
+            const additionalMessages = {
+                "919876543215": [
+                    {
+                        id: "msg15",
+                        from: "919876543215",
+                        text: "Happy birthday! 🎉",
+                        timestamp: "2024-01-13T14:20:00Z",
+                        type: "received",
+                        status: "delivered"
+                    },
+                    {
+                        id: "msg16",
+                        from: "me",
+                        text: "Thank you so much Frank! Really appreciate it! 🙏",
+                        timestamp: "2024-01-13T14:25:00Z",
+                        type: "sent",
+                        status: "read"
+                    }
+                ],
+                "919876543216": [
+                    {
+                        id: "msg17",
+                        from: "919876543216",
+                        text: "I reviewed the quarterly report",
+                        timestamp: "2024-01-13T11:40:00Z",
+                        type: "received",
+                        status: "read"
+                    },
+                    {
+                        id: "msg18",
+                        from: "919876543216",
+                        text: "The report looks good!",
+                        timestamp: "2024-01-13T11:45:00Z",
+                        type: "received",
+                        status: "delivered"
+                    }
+                ],
+                "919876543217": [
+                    {
+                        id: "msg19",
+                        from: "919876543217",
+                        text: "It's been too long since we last met",
+                        timestamp: "2024-01-12T16:28:00Z",
+                        type: "received",
+                        status: "read"
+                    },
+                    {
+                        id: "msg20",
+                        from: "919876543217",
+                        text: "Let's catch up soon",
+                        timestamp: "2024-01-12T16:30:00Z",
+                        type: "received",
+                        status: "delivered"
+                    },
+                    {
+                        id: "msg21",
+                        from: "me",
+                        text: "Absolutely! How about this weekend?",
+                        timestamp: "2024-01-12T16:35:00Z",
+                        type: "sent",
+                        status: "read"
+                    }
+                ]
+            };
+
+            // Merge additional data
+            sampleData.chats = [...sampleData.chats, ...additionalChats];
+            Object.assign(sampleData.messages, additionalMessages);
+        }
+
+        // Initialize emoji picker simulation
+        function initEmojiPicker() {
+            const emojiButton = document.querySelector('.input-emoji');
+            const commonEmojis = ['😊', '😂', '❤️', '👍', '👎', '😢', '😮', '😡', '🎉', '🔥', '💯', '🙏'];
+            
+            emojiButton.addEventListener('click', () => {
+                const messageInput = document.getElementById('messageInput');
+                const randomEmoji = commonEmojis[Math.floor(Math.random() * commonEmojis.length)];
+                messageInput.value += randomEmoji;
+                messageInput.focus();
+            });
+        }
+
+        // Add keyboard shortcuts
+        function initKeyboardShortcuts() {
+            document.addEventListener('keydown', (e) => {
+                // Ctrl/Cmd + K to focus search
+                if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                    e.preventDefault();
+                    document.getElementById('searchBox').focus();
+                }
+                
+                // Escape to close mobile chat view
+                if (e.key === 'Escape' && window.innerWidth <= 768) {
+                    document.getElementById('sidebar').classList.remove('mobile-hidden');
+                    document.getElementById('chatMain').classList.remove('mobile-active');
+                    document.getElementById('backButton').style.display = 'none';
+                }
+            });
+        }
+
+        // Add sound notification simulation
+        function playNotificationSound() {
+            // Create a simple beep sound using Web Audio API
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.value = 800;
+                oscillator.type = 'sine';
+                
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + 0.1);
+            } catch (error) {
+                console.log('Audio not available');
+            }
+        }
+
+        // Initialize everything when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            loadMoreSampleData();
+            initApp();
+            initEmojiPicker();
+            initKeyboardShortcuts();
+            
+            // Start real-time simulations
+            setTimeout(() => {
+                simulateRealTimeMessages();
+                simulateMessageStatusUpdates();
+            }, 5000); // Start after 5 seconds
+            
+            // Add some initial animations
+            const chatItems = document.querySelectorAll('.chat-item');
+            chatItems.forEach((item, index) => {
+                item.style.opacity = '0';
+                item.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    item.style.transition = 'all 0.3s ease';
+                    item.style.opacity = '1';
+                    item.style.transform = 'translateX(0)';
+                }, index * 100);
+            });
+        });
+    </script>
+</body>
+
+</html>
